@@ -2,7 +2,7 @@
 
 ## The data was accessed from https://www.kaggle.com/datasets/sobhanmoosavi/us-traffic-congestions-2016-2022 by Hope McBride on 03/13/2026. 
 
-Though the original dataset contains congestion events from 2016 to 2022, for the purposes of this lab, I selected only those events that occured in 2022. Because the D3 lab will be a choropleth map, I aggregated the data by state averages. 
+The original dataset contains aprox. 33 million congestion records from 2016 to 2022. For the purposes of this lab, I downloaded the provided sampled version of the data (aprox. 2 million events) and selected only those events that occured in 2022. Because the D3 lab will be a choropleth map, I aggregated the data by state averages. 
 
 *NOTE: Alaska and Hawaii were not included in the original dataset; Washington D.C. was included and counted as a state.*
 
