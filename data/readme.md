@@ -1,33 +1,40 @@
-# **Traffic Congestion State Averages in the U.S. in 2022**
+# **Natural Amenities Scale (based on data from 1941-1970)**
 
-#### The data was accessed from https://www.kaggle.com/datasets/sobhanmoosavi/us-traffic-congestions-2016-2022 by Hope McBride on 03/13/2026. 
+#### The data was accessed from https://www.ers.usda.gov/data-products/natural-amenities-scale by Hope McBride on 03/16/2026. 
 
-The original dataset contains aprox. 33 million congestion records from 2016 to 2022. For the purposes of this lab, I downloaded the provided sampled version of the data (aprox. 2 million events) and selected only those events that occured in 2022. Because the D3 lab will be a choropleth map, I aggregated the data by state averages. 
+The original dataset comes from the USDA/Economic Research Service's October 1999 'Natural Amenities Drive Rural Population Change' report. In the original report, the averages of six natural phenomena from 1941-1970 were measured in every U.S. county of the lower 48 states. According to the USDA, the features "were selected on the basis of a conception of the environmental qualities most people prefer, availability of measures, simplicity, nonredundancy, and the correlation to population change." The selected features were used to create an objective Natural Amenities Scale against which each county could be measured.
 
-*NOTE: Alaska and Hawaii were not included in the original dataset; Washington D.C. was included and counted as a state.*
+To format the data for the purposes of this lab, I aggregated the county data to find the state averages of each measurement and final score. 
 
-### Below are the numerical attributes aggregated for each state:
+*NOTE: Alaska and Hawaii were not included in the original dataset; Washington D.C. was included but was manually removed when formatting the data for this project to focus attention on the lower 48 U.S. states.*
 
-* Average severity of traffic events; ranked 0-4, with 0 being the least severe
-* Average delay from typical traffic flow in minutes
-* Average delay from free traffic flow in minutes
-* Average distance/"length of the road extent affected by the congestion event" in miles
-* Average visibility in miles
-* Average congestion speed, originally reported by the provider as slow, moderate, or fast. When formatting the new dataset, I converted 'slow' to 1, 'moderate' to 2, and 'fast' to 3. The averages of those numeric conversions were used to provide the overall average speed of traffic affected by congestion, first in numeric fashion, then numeric+text interpretation, then counts of each speed category event per state.
+### Below are the six features used in the natural amenities composite score:
+
+* Warm winter (avg January temp)
+* Winter sun (avg January days of sun)
+* Temperate summer (low winter-summer temp gap)
+* Summer humidity (low avg July humidity)
+* Topographic variation (topography scale; the more variation in a county, the higher/more appealing the score)
+* Water area (as proportion of total county area)
 
 
-### Below is an excerpt of the description of the original dataset from the source:
+Using the above measures, each county's position on the Amenities Scale was calculated. The deviation from the mean was then used to assign a final rank from 1-7 (see below):
 
-"About Dataset
-Description
+"Deviations from the mean	
+1 = Over -2 (Low)	
+2 = -1 to -2	
+3 = 0 to -1	
+4 = 0 to 1	
+5 = 1 to 2	
+6 = 2 to 3 	
+7 = Over 3 (High)"
 
-This is a countrywide traffic congestion dataset that covers 49 states of the USA. The congestion events data were collected from February 2016 to September 2022, using multiple APIs that provide streaming traffic incident (or event) data. These APIs broadcast traffic data captured by various entities, including the US and state departments of transportation, law enforcement agencies, traffic cameras, and traffic sensors within the road networks. The dataset contains approximately 33 million congestion records. We also provide a sampled version of data that includes 2 million events for easier processing and handling for those who prefer to work with a smaller amount of data.
-Acknowledgements
+In addition to the calculated score on the Amenities Scale and the rank, I included each state's overall rank from 1-48 (in this case, 1 being the highest/best ranked state and 48 being the lowest/worst) for further analysis and evaluation purposes.
 
-If you use this dataset, please kindly cite the following paper:
 
-    Moosavi, Sobhan, Mohammad Hossein Samavatian, Arnab Nandi, Srinivasan Parthasarathy, and Rajiv Ramnath. "Short and long-term pattern discovery over large-scale geo-spatiotemporal data." In Proceedings of the 25th ACM SIGKDD international conference on knowledge discovery & data mining, pp. 2905-2913. 2019.
+### The measurement definitions are sourced from this documentation page: https://www.ers.usda.gov/data-products/natural-amenities-scale/documentation 
 
-Inspiration
 
-The US Traffic Congestion dataset can be used for numerous applications, such as traffic modeling, simulated routing, identifying traffic hotspot locations, and exploring intrinsic traffic patterns and how they evolve over time."
+## Final note: I do not necessarily agree with the final rankings assigned to some states by this scale. However, I realize that my own personal preference towards some states over others plays a role in this disagreement. I would like to see an updated version of this scale some day and would be curious to learn if there are perhaps additional measurements that may shift some of the final scores around. I could not find anything more recent at this time; perhaps creating a new analysis assessment can be a fun project for another day! 
+
+
