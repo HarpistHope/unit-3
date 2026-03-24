@@ -29,7 +29,7 @@ function setMap() {
         .projection(projection);
 
     var promises = [
-        d3.csv("data/state_natural_amenities.csv"),
+        d3.csv("data/state_natural_amenities_avg.csv"),
         d3.json("data/states_wgs84.topojson")
     ];
     Promise.all(promises).then(callback);
