@@ -29,7 +29,6 @@ Using the above measures, each county's position on the Amenities Scale was calc
 6 = 2 to 3 	
 7 = Over 3 (High)"
 
-In addition to the calculated score on the Amenities Scale and the rank, I included each state's overall rank from 1-48 (in this case, 1 being the highest/best ranked state and 48 being the lowest/worst) for further analysis and evaluation purposes.
 
 
 ### The measurement definitions are sourced from this documentation page: https://www.ers.usda.gov/data-products/natural-amenities-scale/documentation 
