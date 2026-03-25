@@ -18,7 +18,7 @@ To format the data for the purposes of this lab, I aggregated the county data to
 * Water area (as proportion of total county area)
 
 
-Using the above measures, each county's position on the Amenities Scale was calculated. The deviation from the mean was then used to assign a final rank from 1-7 (see below):
+Using the above measures, each county's position on the Amenities Scale was calculated. The deviation from the mean was then used to assign a final class rank from 1-7 (see below):
 
 "Deviations from the mean	
 1 = Over -2 (Low)	
