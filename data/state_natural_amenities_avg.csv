@@ -1,4 +1,4 @@
-state,state_name,avg_jan_temp,avg_jan_sun,avg_jul_temp,avg_jul_hum,avg_water_area,avg_topography_z,avg_amenity_scale,avg_amenity_class
+ISO3166_2,state_name,avg_jan_temp,avg_jan_sun,avg_jul_temp,avg_jul_hum,avg_water_area,avg_topography_z,avg_amenity_scale,avg_amenity_class
 CA,California,44.44,174.414,71.502,42.328,7.542,1.36,6.729,7
 AZ,Arizona,43.287,248.4,81.6,25.733,0.273,0.565,4.87,7
 NV,Nevada,30.476,200.0,72.547,17.529,1.401,0.518,4.718,7
