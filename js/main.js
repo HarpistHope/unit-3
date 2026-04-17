@@ -48,8 +48,8 @@
     },
     {
         attr:"avg_water_area_z",
-        label:"Standardized Water Area Score",
-        unit:"Standard deviations from mean (z-score)"
+        label:"Water Area (Standardized)",
+        unit:"Z-Score (log-transformed water area)"
     },
     {
         attr:"avg_topography_z",
@@ -67,7 +67,7 @@
     var expressed  = {
         x:attrObjects[0].attr, //x attribute (avg_jan_temp)
         y:attrObjects[0].attr, //y attribute (avg_jan_temp)
-        color: null //start without color, user will select
+        color: null //start without color, user must select to activate color and bubbles
     }
 
     // create and initalize global state popup variable
@@ -85,7 +85,7 @@
 
     var chartHeight = window.innerHeight - 250;
 
-    // log basic intro info
+    // log shapefile intro info 
     console.log("U.S. States Shapefile from: https://www.projectlinework.org/. Editors: Daniel P. Huffman, Hans van der Maarel. Shapefile Name: Times Approximate. I selected the contiguous U.S and reprojected the shapefile to WGS 84 in ArcGIS Pro before converting to topojson with MapShaper. - H. McBride, 03/21/2026")
 
     //begin script when window loads
@@ -95,7 +95,6 @@
     function setMap(){
 
         //check size of screen, if over 700 pixels, create a map container the entire width of the screen
-        //the map will stack atop the chart
         if(window.innerWidth < 700)
             var mapWidth = window.innerWidth - 40
         else
@@ -124,7 +123,7 @@
 
         //use Promise.all to parallelize asynchronous data loading
         var promises = [
-            d3.csv("data/state_natural_amenities_waterZ.csv"),
+            d3.csv("data/state_natural_amenities.csv"),
             d3.json("data/states_wgs84.topojson")
         ];
         Promise.all(promises).then(callback);
@@ -139,8 +138,8 @@
         function callback(data){	
             
             var csvData = data[0], topoData = data[1];
-                // console.log(csvData);
-                // console.log(topoData);
+                console.log(csvData);
+                console.log(topoData);
 
             //translate TopoJSON to geojson
             var usStates = topojson.feature(topoData, topoData.objects.states_wgs84).features;
@@ -168,8 +167,10 @@
 
             //add dropdown to adjust attribute
             createDropdown(csvData, "color", "Select Color/Bubble Size");
+
             // add dropdown to adjust x axis
             createDropdown(csvData, "x", "Select X Axis");
+
             // add dropdown to adjust y axis
             createDropdown(csvData, "y", "Select Y Axis");
 
@@ -182,7 +183,7 @@
 
         // set up clicked function to zoom to bounding box (state) and make statePopup visible; adapted from d3 gallery
         function clicked(event, d) {
-            // statePopup will activate/turn visible on click
+            // turn statePopup visible on click
             statePopup.style("visibility", "visible")
 
             // create bounding box, from d3
@@ -240,14 +241,14 @@
                 })
                 .attr("d", path)
                .style("fill", function (d) {
-			//check to make sure a data value exists, if not set color to gray
-			var value = d.properties[expressed.color];            
-			if(value != null) {            	
-				return colorScale(d.properties[expressed.color]);            
-			} else {            	
-				return "#ccc";            
-			}    
-		})
+                    //check to make sure a data value exists, if not set color to gray
+                    var value = d.properties[expressed.color];            
+                    if(value != null) {            	
+                        return colorScale(d.properties[expressed.color]);            
+                    } else {            	
+                        return "#ccc";            
+                    }    
+                })
 
         // (from d3 example) add click interaction to zoom to bounding box/state
         .on("click", function(event, d){
@@ -262,8 +263,8 @@
             // Create popup with additional info about association between natural amenities scale score and class rank
             statePopup.html(
                 `<strong>State:</strong> ${d.properties.NAME}<br><br>
-                <strong>Natural Amenity Scale and Rank: </strong>On the standardized natural amenity scale, ${d.properties.NAME} comes in at <strong>${d.properties.avg_amenity_scale}.</strong><br><br>
-                Using this standardized score to rank the state from 1 to 7 (1 meaning low natural amenity appeal, 7 meaning high natural amenity appeal) gives ${d.properties.NAME} an overall natural amenity rank of:<strong> ${d.properties.amen_class}</strong>`
+                <strong>Natural Amenity Scale & Classification: </strong>On the standardized natural amenity scale, ${d.properties.NAME} comes in at <strong>${d.properties.avg_amenity_scale}</strong>.<br><br>
+                This gives ${d.properties.NAME} an overall rank of <strong>${d.properties.amen_class}</strong> within the derived 1-7 classification schema (1 = low natural amenity appeal, 7 = high natural amenity appeal)`
             ); 
 
             // Position popup (uses window percentages of vis-container to position it consistantly on the map frame), turn visibility on when clicked
@@ -339,7 +340,7 @@
                     }
                 }
             }
-        // console.log(usStates);
+        console.log(usStates);
         return usStates;
 
     };
@@ -448,6 +449,7 @@
         var xScale = createXScale(csvData, chartWidth);
         //create axes
         createChartAxes(chart,chartWidth,chartHeight, yScale, xScale) 
+
         // Here I set up a radius scale instead of using Flannery's computation to proportionally scale my bubbles according to selected attribute (the range of my data values is too large to use Flannery's for everything)
         // this way, the bubbles don't get too big and fall out of the chart frame
         var radiusScale = createRadiusScale(csvData);
@@ -480,7 +482,7 @@
             // add slight border to the circles
             .attr("stroke", "#333")
             .attr("stroke-width", 0.5)
-            // add highlight, dehighlight, and moveLabel interactions
+            // add highlight, dehighlight, and moveLabel mouseover interactions
             .on("mouseover", function (event, d) {
                 highlight(d);
             })
@@ -549,7 +551,7 @@
             .select(".navbar")
             .append("h1")
             .attr("class", "pageTitle")
-            .text("20th Century U.S. Natural Amenities Scale")
+            .text("U.S. Natural Amenities Scale Explorer")
     }
 
     //dropdown change event handler
@@ -744,27 +746,30 @@
             .append("div")
             .attr("class", "legend");
 
+        // get colorScale domain and range
         var domain = colorScale.domain();
         var range = colorScale.range();
         
+        // bind range/color classes to legend
         var items = legend.selectAll(".legend-item")
             .data(range)
             .enter()
             .append("div")
             .attr("class", "legend-item");
 
-        // define units to add to the labels
+        // get unit label for expressed attribute
         var unitLabel;
         attrObjects.forEach(function(x){
             if (expressed.color == x.attr)
                 unitLabel = x.unit;
         });
 
+        // add color
         items.append("div")
             .attr("class", "legend-color")
             .style("background-color", d => d);
 
-        // update legend labels dynamically
+        //return legend labels for each class break
         items.append("span")
             .text((d, i) => {
                 if (i === 0) {
@@ -776,6 +781,7 @@
                 }
             });
         
+        // add title above lgend items
         d3.select("#legend")
             .insert("div", ":first-child")
             .style("text-align", "center")
@@ -786,25 +792,3 @@
 })(); //last line of main.js
 
 
-
-// Pseudocode:
-
-// for zoom to feature, add popup containing info for all three chosen attributes per the clicked state
-// edit popup position, esp for mobile
-// move .style features to css
-//Change welcome popup from fade out to exit
-// Add page context below the map
-// add text styles 
-// Check rubric, you might be close? 
-
-        // Responsive design, css grids, navbar restyling
-        // Readable options; set up json to match prop titles to human readable forms, loop through object props until match -- retreive label
-        // dynamic choropleth legend, update on attribute sequencing
-        // other interactoin operators: zoom, pan, search, filter, reexpress, overlay, resymbolize, reproject, arrange, calculate
-        // adjust width and placement of map itself to resize with window
-        // additional coordinated data visualizatoins
-        // metadata and other supplementary info -- give context!
-        // style through css
-        // any other tools or features that add to the utility, usability, and or aesthetics of the coordinated vis
-        // 
-        

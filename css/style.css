@@ -1,6 +1,6 @@
 /* Add CSS styles here */
 #vis-container {
-    position: relative;
+    position: relative; /* I use this to anchor statepopup to vis-container, not whole page */
 }
 
 .state {
@@ -32,9 +32,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 0.8em;
     font-weight: bold;
-    flex: 1 1 auto;
     margin: 0;
-
 }
 
 .navbar{
@@ -74,7 +72,7 @@
     border-radius: 6px;
 }
 
-/* resize dropdowns dynamically when the window size changes */
+/* resize dropdowns, navbar, map, chart, and statePopups dynamically when the window size changes */
 @media (max-width: 700px) {
     .navbar {
         flex-direction: column;
@@ -106,7 +104,7 @@
     }
     .statePopup {
         width: 80%;
-        left: 50% !important;
+        left: 50% !important; /*I use !important to override original position style set in main.js*/
         top: 48% !important;
         transform: translate(-50%, -100%) !important;
     }
@@ -144,7 +142,6 @@ option {
 .selected{
     stroke: rgb(251, 247, 25);
     stroke-width: 2.6px;
-    /* highlighter yellow: rgb(251, 247, 25) */
 }
 
 .infolabel {
@@ -170,8 +167,6 @@ option {
 .reset-button rect {
     fill: #ffffff;
     stroke: #333;
-    position: relative;
-    z-index: 4000;
 }
 
 .reset-button text {
@@ -231,7 +226,7 @@ option {
     margin-top: 10px;
     padding: 6px 12px;
     cursor: pointer;
-    background: rgb(180, 200, 179, 0.475)
+    background: rgba(180, 200, 179, 0.475)
 }
 
 #legend-container {
@@ -269,6 +264,7 @@ option {
     border: solid thin rgb(180, 200, 179, 0.475);
 }
 
+/* style the html webpage context */
 #context {
     max-width: 900px;
     margin: 30px auto;
@@ -290,20 +286,13 @@ option {
     padding-left: 10px;
 }
 
-.styled-list {
-    padding-left: 20px;
-}
-
-.styled-list li {
-    margin-bottom: 8px;
-}
-
 #context a {
     color: #1a7f37;
     text-decoration: none;
     font-weight: 600;
 }
 
+/* add underline affordance when user hovers over clickable links */
 #context a:hover {
     text-decoration: underline;
 }

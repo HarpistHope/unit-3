@@ -51,7 +51,7 @@
                         <li><b>Temperate Summers:</b> average July Temperature</li>
                         <li><b>Summer Humidity:</b> relative humidity in July</li>
                         <li><b>Topographic Variation:</b> ordinal landform diversity class (derived from a 21-category topography scale based on dominant landform types and variation within each county); higher classes reflect more varied and mountainous terrain and contributed more to the composite standardized score used in this project</li>
-                        <li><b>Water Area:</b> proportion of county covered by water (log-transformed and capped to reduce coastal bias) </li>
+                        <li><b>Water Area:</b> proportion of county covered by water (capped to reduce coastal bias, log-transformed and standardized as a z-score) </li>
                     </ul>
             </section>
             <section class="context-section">
@@ -81,6 +81,9 @@
                     </p>
                     <p>
                         Data can be easily accessed from the USDA's website using the following link: <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale">Natural Amenities Scale</a>
+                    </p>
+                    <p>
+                        U.S. States Shapefile accessed from the Project Linework <a href="https://www.projectlinework.org/">webpage</a> (Editors: Daniel P. Huffman, Hans van der Maarel. Shapefile Name: Times Approximate.) For this project, I selected the contiguous U.S and reprojected the shapefile to WGS 84 in ArcGIS Pro before converting to topojson with MapShaper.
                     </p>
             </section>
         </div>
