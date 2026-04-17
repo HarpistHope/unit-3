@@ -68,7 +68,7 @@
     /* make dropdowns smaller on smaller screens */
     flex: 1 1 auto;
     min-width: 180px;
-    max-width: 260px;
+    max-width: 240px;
 
     background: rgba(255,255,255,0.3);
     padding: 10px;
