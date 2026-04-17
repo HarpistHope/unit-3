@@ -4,7 +4,7 @@
 
 The original dataset comes from the USDA/Economic Research Service's October 1999 'Natural Amenities Drive Rural Population Change' report. In the original report, the averages of six natural phenomena from 1941-1970 were measured in every U.S. county of the lower 48 states. According to the USDA, the features "were selected on the basis of a conception of the environmental qualities most people prefer, availability of measures, simplicity, nonredundancy, and the correlation to population change." The selected features were used to create an objective Natural Amenities Scale against which each county could be measured. Each variable was first standardized as a z-score, and these standardized values were then combined into a composite natural amenities scale. The final amenity score represents a composite of standardized environmental variables, allowing comparison of relative natural attractiveness across regions.
 
-To format the data for the purposes of this lab, I aggregated the county data to find the state averages of each measurement and final score. /In the aggregated dataset, most variables are expressed as averages or percentages, making them comparable across states. Some variables (e.g., topography and amenity scale) are standardized as z-scores to represent deviation from the mean. For visualization, all variables are dynamically classified using a natural breaks (ckmeans) method to ensure consistent choropleth mapping across different data types. This visualization allows users to explore how different environmental factors contribute to perceived natural amenities across U.S. states and compare patterns across regions.'
+To format the data for the purposes of this lab, I aggregated the county data to find the state averages of each measurement and final score.
 
 *NOTE: Alaska and Hawaii were not included in the original dataset; Washington D.C. was included but was manually removed when formatting the data for this project to focus attention on the lower 48 U.S. states.*
 
@@ -35,6 +35,3 @@ Using the above measures, each county's position on the Amenities Scale was calc
 
 
 ## Final note: I do not necessarily agree with the final rankings assigned to some states by this scale. However, I realize that my own personal preference towards some states over others plays a role in this disagreement. I would like to see an updated version of this scale some day and would be curious to learn if there are perhaps additional measurements that may shift some of the final scores around. I could not find anything more recent at this time; perhaps creating a new analysis assessment can be a fun project for another day! 
-
-
-** how does public perception of natural features such as topography, nearby water, temperature and humidity play into deliniations of 'desireable areas?' Can the final score be called objective? Where does personal preference play into these measurements? 50 years in the future, do you think the perceptions amnd scores would be the same? What additional features should be added to the assessment? Should state population or percentage rural/populated areas play a role? 
