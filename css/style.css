@@ -1,4 +1,8 @@
 /* Add CSS styles here */
+#vis-container {
+    position: relative;
+}
+
 .state {
     fill: white;
     stroke: grey;
@@ -7,41 +11,122 @@
 }
 
 .map {
-    border: medium solid #999;
-    margin: 5px 0 0 20px;
-    background:rgb(194, 194, 195);
+    border: medium solid #228006c9;
+    border-radius: 10px;
+    margin: 5px 0 0 0px;
+    background:rgba(180, 200, 179, 0.475);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 /*Chapter 10 Styling*/
 .chart {
-    background-color: rgb(194, 194, 195);
-    border: medium solid #999;
-    float: right;
+    background-color: rgba(180, 200, 179, 0.475);
+    border: medium solid #228006c9;
+    border-radius: 10px;
     margin: 5px 0 0 0;
+    float: right;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .chartTitle {
-    font-family: sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 0.8em;
     font-weight: bold;
+    flex: 1 1 auto;
+    margin: 0;
+
 }
 
 .navbar{
     top:0;
     left:0;
-    background:lightgray;
-    padding:25px;
+    background:rgba(68, 196, 56, 0.475);
+    border: medium solid #228006c9;
+    border-radius: 10px 10px;
+    padding:10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    
+    /* Here I style the navbar to make the dropdowns better positioned in a stack to the right of the title*/
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 15px;
+}
+
+.pageTitle{
+    font-size: 23px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.dropdowns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    /* make dropdowns smaller on smaller screens */
+    flex: 1 1 auto;
+    min-width: 180px;
+    max-width: 260px;
+
+    background: rgba(255,255,255,0.3);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* resize dropdowns dynamically when the window size changes */
+@media (max-width: 700px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .dropdowns {
+        width: 60%;
+        max-width: 320px;
+        align-items: center;
+    }
+    .dropdown-label {
+        justify-content: center;
+    }
+    .dropdown {
+        width: 100%;
+        max-width: 280px;
+    }
+    .map {
+        display: block;
+        width: 90%;
+        margin: 10px auto;
+    }
+    .chart {
+        float: none;
+        display: block;
+        width: 90%;
+        margin: 10px auto;
+    }
+    .statePopup {
+        width: 80%;
+        left: 50% !important;
+        top: 48% !important;
+        transform: translate(-50%, -100%) !important;
+    }
+
 }
 
 .dropdown {
+    width: 100%;
+    min-width: 140px;
+    max-width: 220px;
     z-index: 10;
-    font-family: sans-serif;
-    font-size: 1em;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9em;
     font-weight: bold;
-    padding: 2px;
+
+    padding: 3px;
     border: 2px solid #999;
+    border-radius: 5px 5px;
     box-shadow: 2px 2px 4px #999;
-    margin-right:15px;
 }
 
 option {
@@ -50,27 +135,175 @@ option {
 
 /*Example 1.15*/
 .dropdown-label{
-    display:inline;
+    display: flex;
+    align-items: center;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9em;
 }
 
 .selected{
-    stroke: greenyellow;
-    stroke-width: 2px;
+    stroke: rgb(251, 247, 25);
+    stroke-width: 3px;
+    /* highlighter yellow: rgb(251, 247, 25) */
 }
 
 .infolabel {
     position: absolute;
-    height: 50px;
-    min-width: 100px;
+    height: 40px;
+    min-width: 50px;
     color: #fff;
-    background-color: #000;
-    border: solid thin #fff;
+    background:rgb(68, 196, 56);
+    border: 2px solid rgb(98, 112, 94);
+    border-radius: 10px 10px;
     padding: 5px 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .infolabel h1 {
-    margin: 0 20px 0 0;
+    margin: 2px 20px 0 0;
     padding: 0;
     display: inline-block;
     line-height: 1em;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.reset-button rect {
+    fill: #ffffff;
+    stroke: #333;
+    position: relative;
+    z-index: 4000;
+}
+
+.reset-button text {
+    fill: #333;
+    font-size: 12px;
+    font-family: sans-serif;
+    z-index: 4000;
+}
+
+.reset-button:hover rect {
+    fill: #eeeeee;
+}
+
+.statePopup {
+    position: absolute;
+    z-index: 3000;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+
+    opacity: 0.92;
+    backdrop-filter: blur(2px);
+    max-width: 400px;
+    max-height: 350px;
+    pointer-events: auto;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.9rem;
+}
+
+.welcomePopup {
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* I found out I could add a translucent overlay behind the welcome popup; I like the visual pop! */
+    background: rgba(0,0,0,0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcome-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.close-btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    background: rgb(180, 200, 179, 0.475)
+}
+
+#legend-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 7px 0;
+}
+
+.legend {
+    display: inline-flex;
+    gap: 15px;
+    padding: 7px;
+}
+
+.legend-item {
+    margin-top: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 12px;
+    gap: 5px;
+}
+
+.legend span {
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border: solid thin rgb(180, 200, 179, 0.475);
+}
+
+#context {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+}
+
+.context-section {
+    margin-bottom: 25px;
+}
+
+.context-section h2 {
+    margin-bottom: 10px;
+    border-left: 4px solid #228006c9;
+    padding-left: 10px;
+}
+
+.styled-list {
+    padding-left: 20px;
+}
+
+.styled-list li {
+    margin-bottom: 8px;
+}
+
+#context a {
+    color: #1a7f37;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#context a:hover {
+    text-decoration: underline;
 }

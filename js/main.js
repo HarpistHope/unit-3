@@ -1,23 +1,44 @@
-// example 1.2: Defining attrArray and expressed as pseudo-global variables in main.js
-console.log("At the moment, the states and bubbles are color classified according to amenity class score (1/light color = worst, 7/dark color = best). The x axis shows average January temp and the y axis shows average July temp. I do not love the style of the axes + labels at the moment; I will fix these for the final d3 lab.");
 //First line of main.js...wrap everything in a self-executing anonymous function to move to local scope
 (function(){
-//label dropdown menus
-    //pseudo-global variables
+
+    // I start by creating a welcome popup/point of entry to the webpage
+    var welcome = d3.select("body")
+        .append("div")
+        .attr("class", "welcomePopup")
+;
+
+    // define welcome popup; add close button
+    welcome.html(`
+        <div class="welcome-content">
+        <p><strong>Welcome to the 1970s Natural Amenity Scale Explorer!</strong></p>
+        <p>Add some color to the map and place bubbles on the chart by selecting attributes from the dropdowns above.</p>
+        <p>Click on a state to zoom and open additional ranking details.</p>
+        <p>Hover over a state to see a summary of the selected color/bubble size attribute.</p>
+        <p>Examine the chart to see how any three attributes may relate to each other.</p>
+        <button class="close-btn">Close</button>
+        </div>
+        `);
+    // add close button click funtion
+    d3.select(".close-btn").on("click", function() {
+        welcome.style("display", "none")
+    })
+
+    // Pseudo-global variables 
+    // Start with array of attributes
     var attrObjects = [{
         attr:"avg_jan_temp",
         label:"Mean January Temp",
-        unit:"Degrees, Fahrenheit"
+        unit:"Degrees (Fahrenheit)"
     },
     {
         attr:"avg_jan_sun",
-        label:"Mean Hours Sunlight, January",
+        label:"Mean Hours of Sunlight, Jan.",
         unit:"Hours"
     },
     {
         attr:"avg_jul_temp",
         label:"Mean July Temp",
-        unit:"Degrees, Fahrenheit"
+        unit:"Degrees (Fahrenheit)"
     },
     {
         attr:"avg_jul_hum",
@@ -31,45 +52,46 @@ console.log("At the moment, the states and bubbles are color classified accordin
     },
     {
         attr:"avg_topography_z",
-        label:"Topography Z Score",
-        unit:"TerraWatt Hours"
-    },
-    {
-        attr:"avg_amenity_scale",
-        label:"Natural Amenity Z Score",
+        label:"Standardized Topography (z-score)",
         unit:"Standard deviations from mean (z-score)"
     },
     {
-        attr:"avg_amenity_class",
-        label:"Natural Amenity Rank",
-        unit:"Categorical (ranked classes)"
-    }]
-   
-	//pseudo-global variables
+        attr:"avg_amenity_scale",
+        label:"Natural Amenity Score (z-score)",
+        unit:"Standard deviations from mean (z-score)"
+    },
+    ]
 
     //create an object for different expressed variables
     var expressed  = {
         x:attrObjects[0].attr, //x attribute (avg_jan_temp)
-        y:attrObjects[2].attr, //y attribute (avg_july_temp)
-        color:attrObjects[7].attr //color/size attribute (amenity_class, 1 = worst, 7 = best))
+        y:attrObjects[0].attr, //y attribute (avg_jan_temp)
+        color: null //start without color, user will select
     }
-    //chart frame dimensions
-    //check size of screen, if over 700 pixels, create a chart container the entire width of the screen.
+
+    // create and initalize global state popup variable
+    var statePopup = d3.select("#vis-container")
+        .append("div")
+        .attr("class", "statePopup")
+        .style("position", "absolute")
+        .style("visibility", "hidden");
+
+    //chart frame dimensions; check size of screen, if over 700 pixels, create a chart container the entire width of the screen.
     //The chart will stack below the map
     if(window.innerWidth < 700)
         var chartWidth = window.innerWidth - 40
     else
         var chartWidth = window.innerWidth * 0.5 - 25
 
-    var chartHeight = window.innerHeight - 170;
+    var chartHeight = window.innerHeight - 250;
 
+    // log basic intro info
     console.log("U.S. States Shapefile from: https://www.projectlinework.org/. Editors: Daniel P. Huffman, Hans van der Maarel. Shapefile Name: Times Approximate. I selected the contiguous U.S and reprojected the shapefile to WGS 84 in ArcGIS Pro before converting to topojson with MapShaper. - H. McBride, 03/21/2026")
 
     //begin script when window loads
-    window.onload = setMap();
+    window.onload = setMap;
 
-
-    //set up choropleth map
+    // first funciton (within wrapping anonymous function), set up choropleth map
     function setMap(){
 
         //check size of screen, if over 700 pixels, create a map container the entire width of the screen
@@ -77,26 +99,26 @@ console.log("At the moment, the states and bubbles are color classified accordin
         if(window.innerWidth < 700)
             var width = window.innerWidth - 40
         else
-            var width = window.innerWidth * 0.5 - 25
+            var width = window.innerWidth * 0.5 - 10
 
-        var height = window.innerHeight - 170;
+        var height = window.innerHeight - 250;
 
         //create new svg container for the map
-        var map = d3.select("body")
+        var map = d3.select("#vis-container")
             .append("svg")
             .attr("class", "map")
             .attr("width", width)
             .attr("height", height);
 
-        
-        //Example 2.1 line 15...create Albers equal area conic projection -- This will be an appropriate projection for my choropleth map focusing on the lower 48 US States
-        var projection = d3.geoAlbers()
-            .center([-96, 39.1])
-            .rotate([49, 36, 17])
-            .parallels([29.5, 45.5])
-            .scale(700)
-            .translate([width / 2 - 40, height / 2 - 90]); // I adjusted height/width slightly to better center the map within the frame
+        // Here I begin to integrate the D3 zoom to bounding box interaction to my map
+        // I will pass g into setEnumerationUnits and add zoom/click-to-zoom functions
+        var g = map.append("g");
 
+        //Create Albers equal area conic projection -- This will be an appropriate projection for my choropleth map focusing on the lower 48 US States
+        // I removed the hardcoded projection parameters so the map will resize responsively with the window (see callback function below)
+        var projection = d3.geoAlbers()
+
+        // define my path
         var path = d3.geoPath()
             .projection(projection);
 
@@ -107,12 +129,17 @@ console.log("At the moment, the states and bubbles are color classified accordin
         ];
         Promise.all(promises).then(callback);
 
+        // add zoom interaction behavior to the map
+        var zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .on("zoom", zoomed);
+        map.call(zoom);
 
         function callback(data){	
             
             var csvData = data[0], topoData = data[1];
-                console.log(csvData);
-                console.log(topoData);
+                // console.log(csvData);
+                // console.log(topoData);
 
             //translate TopoJSON
             var usStates = topojson.feature(topoData, topoData.objects.states_wgs84).features;
@@ -120,11 +147,17 @@ console.log("At the moment, the states and bubbles are color classified accordin
             //join csv data to GeoJSON enumeration units
             usStates = joinData(usStates, csvData);
 
+            // add responsive projection parameters with responsive padding
+            var padding = Math.max(10, width * 0.05);
+            projection.fitExtent(
+                [[padding, padding], [width - padding, height - padding]], 
+                {type: "FeatureCollection", features: usStates});
+
             // create the color scale
             var colorScale = makeColorScale(csvData);
 
             //add enumeration units to the map
-            setEnumerationUnits(usStates, map, path, colorScale);
+            setEnumerationUnits(usStates, g, path, colorScale);
 
             //add coordinated visualization to the map
             setChart(csvData, colorScale);
@@ -133,46 +166,69 @@ console.log("At the moment, the states and bubbles are color classified accordin
             createTitle();
 
             //add dropdown to adjust attribute
-            createDropdown(csvData, "color", "Select Color/Size");
+            createDropdown(csvData, "color", "Select Color/Bubble Size");
             // add dropdown to adjust x axis
-            createDropdown(csvData, "x", "Select X");
+            createDropdown(csvData, "x", "Select X Axis");
             // add dropdown to adjust y axis
-            createDropdown(csvData, "y", "Select Y");
+            createDropdown(csvData, "y", "Select Y Axis");
 
-        };
-    }; //end of setMap()
-
-    function joinData(usStates, csvData){
-        //...DATA JOIN LOOPS FROM EXAMPLE 1.1
-        //loop through csv to assign each set of csv attribute values to geojson states
-            for (var i = 0; i < csvData.length; i++) {
-                var csvState = csvData[i]; //the current state
-                var csvKey = csvState.ISO3166_2; //the CSV primary key
-
-                //loop through geojson states to find correct state
-                for (var a = 0; a < usStates.length; a++) {
-                    var geojsonProps = usStates[a].properties; //the current state geojson properties
-                    var geojsonKey = geojsonProps.ISO3166_2; //the geojson primary key
-
-                    //where primary keys match, transfer csv data to geojson properties object
-                    if (geojsonKey == csvKey) {
-                        //assign all attributes and values
-                        attrObjects.forEach(function (attr) {
-                            var val = parseFloat(csvState[attr.attr]); //get csv attribute value
-                            geojsonProps[attr.attr] = val; //assign attribute and value to geojson properties
-                        });
-                    }
-                }
+            //render dynamic legend using colorScale
+            if (expressed.color) {
+                renderLegend(colorScale);
             }
-        console.log(usStates);
-        return usStates;
+            
+        };
 
-    };
+        // set up clicked funtion to zoom to bounding box (state); adapted from d3 gallery
+        function clicked(event, d) {
+            // turn statepopup visible upon click
+            statePopup.style("visibility", "visible")
 
-    function setEnumerationUnits(usStates, map, path, colorScale){
+            // set up zoom sequence, from d3
+            const [[x0, y0], [x1, y1]] = path.bounds(d);
+            event.stopPropagation();
+
+            map.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity
+                    .translate(
+                        +map.attr("width") / 2, 
+                        +map.attr("height") / 2 - 80) // I shift the map up a bit to see the state over the popup more clearly
+                    .scale(Math.min(8, 0.65 / Math.max(
+                        (x1 - x0) / map.attr("width"),
+                        (y1 - y0) / map.attr("height")
+                    )))
+                    .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+                
+        )};
+
+        // add click and reset interactions from d3 gallery
+        map.on("click", reset);
+
+        // add zoom function (part of d3 zoom to bounding box interaction )
+        function zoomed(event) {
+            g.attr("transform", event.transform);
+            g.attr("stroke-width", 1 / event.transform.k);
+        }
+
+        // add function to reset zoom, hide popup visability
+        function reset() {
+            map.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity
+            );
+            // make popup invisible again
+            statePopup.style("visibility", "hidden")
+            // dehighlight selected state
+            d3.selectAll(".state").classed("selected", false);
+        }
+
+        // I added setEnumerationUnits to the setMap function so I can use the d3 interaction zoom to bounding box (i.e, enumeration unit)
+        function setEnumerationUnits(usStates, g, path, colorScale){
+
         //...STATES BLOCK FROM CHAPTER 8
         //add States to map as enumeration units
-            var states = map
+            var states = g
                 .selectAll(".state") 
                 .data(usStates)
                 .enter()
@@ -190,25 +246,112 @@ console.log("At the moment, the states and bubbles are color classified accordin
 				return "#ccc";            
 			}    
 		})
-        // I changed the atribute name in the csv file from 'state' to ISO3166_2 to match the geojson; 
-        // 
+
+        // (from d3 example) add click interaction to zoom to bounding box/state
+        .on("click", function(event, d){
+            // prevent reset from immediately firing
+            event.stopPropagation();
+
+            // remove the hover label on click; it comes back as soon as the mouseover starts again
+            d3.select(".infolabel").remove();
+            console.log(d.properties);
+            clicked(event, d);
+
+            // Add state-specific popup containing additional info about associate between natural amenities scale score and class rank
+            statePopup.html(
+                `<strong>State:</strong> ${d.properties.NAME}<br><br>
+                <strong>Natural Amenity Scale and Rank: </strong>On the standardized natural amenity scale, ${d.properties.NAME} comes in at <strong>${d.properties.avg_amenity_scale}.</strong><br><br>
+                Using this standardized score to rank the state from 1 to 7 (1 meaning low natural amenity appeal, 7 meaning high natural amenity appeal) gives ${d.properties.NAME} an overall natural amenity rank of:<strong> ${d.properties.amen_class}</strong>`
+            ); 
+
+            // get map bounding box
+            var mapRect = d3.select(".map").node().getBoundingClientRect();
+
+            // Call and Position popup, turn visibility on when clicked
+            statePopup
+                .style("left", "25%")
+                .style("top", "95%")
+                .style("transform", "translate(-50%, -100%)")
+                .style("visibility", "visible");
+            
+        })
+
+        // add highlight, dehighlight, moveLabel interactions
         .on("mouseover", function (event, d) {
             highlight(d.properties); 
         })
         .on("mouseout", function(event, d){
             dehighlight(d.properties);
         })
-        .on("mousemove", moveLabel);
+        .on("mousemove", function(event, d){
+            moveLabel(event, d);
+        });
     }
+
+        // define padding for the reset button
+        var padding = Math.max(10, width * 0.02);
+        
+        // add reset button to zoom back to default view; the "translate..." statement should help position the button appropriately even when the window is resized
+        var resetButton = map.append("g")
+            .attr("class", "reset-button")
+            .attr("transform", "translate(" + padding + "," + padding + ")")
+            .style("cursor", "pointer")
+            .on("click", reset)
+
+        // set up reset button svg
+        resetButton.append("rect")
+            .attr("width", 80)
+            .attr("height", 30)
+            .attr("rx", 6)
+            .attr("ry", 6);
+        // add reset button text
+        resetButton.append("text")
+            .attr("x", 40)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text("Reset Zoom");
+
+    }; //end of setMap()
+
+    function joinData(usStates, csvData){
+        //...DATA JOIN LOOPS FROM EXAMPLE 1.1
+        //loop through csv to assign each set of csv attribute values to geojson states
+            for (var i = 0; i < csvData.length; i++) {
+                var csvState = csvData[i]; //the current state
+                var csvKey = csvState.ISO3166_2; //the CSV primary key
+
+                //loop through geojson states to find correct state
+                for (var a = 0; a < usStates.length; a++) {
+                    var geojsonProps = usStates[a].properties; //the current state geojson properties
+                    var geojsonKey = geojsonProps.ISO3166_2; //the geojson primary key
+
+                    //where primary keys match, transfer csv data to geojson properties object
+                    if (geojsonKey == csvKey) {
+                        // first I separate out the average amenity class rank
+                        // because this attribute doesn't normalize well with the rest of my datat (it divides the states into one of 7 rank categories), I will add it to the .on click popup as an extra detail
+                        geojsonProps.amen_class = parseFloat(csvState.avg_amenity_class);
+
+                        //assign all attributes and values
+                        attrObjects.forEach(function (attr) {
+                            var val = parseFloat(csvState[attr.attr]); //get csv attribute value
+                            geojsonProps[attr.attr] = val; //assign attribute and value to geojson properties
+                        });
+                    }
+                }
+            }
+        // console.log(usStates);
+        return usStates;
+
+    };
 
     //function to create color scale generator - I chose to use natural breaks/ckmeans because my data shows variation and clusters
     function makeColorScale(data){
         var colorClasses = [
-        "#eff3ff",
-        "#bdd7e7",
-        "#6baed6",
-        "#3182bd",
-        "#08519c"
+        "#ffffcc",
+        "#c2e699",
+        "#78c679",
+        "#31a354",
+        "#006837"
         ];
 
         //create color scale generator
@@ -259,14 +402,14 @@ console.log("At the moment, the states and bubbles are color classified accordin
     function createYScale(csvData, chartHeight){
         var dataMinMax = getDataValues(csvData, expressed.y)
         // add padding so the bubbles don't go off the chart
-        var padding = 4; 
+        var padding = 5; 
         return yScale = d3.scaleLinear().range([chartHeight, 0]).domain([dataMinMax[0] - padding, dataMinMax[1] + padding]);
     }
     //function to create x scale
     function createXScale(csvData, chartWidth){
         var dataMinMax =  getDataValues(csvData, expressed.x)
         // same as above, add padding so bubbles don't go off the chart
-        var padding = 4;
+        var padding = 5;
         return xScale = d3.scaleLinear().range([0, chartWidth]).domain([dataMinMax[0] - padding, dataMinMax[1] + padding]);
     }
 
@@ -296,7 +439,7 @@ console.log("At the moment, the states and bubbles are color classified accordin
         //     chartHeight = 500;
 
         //create a second svg element to hold the bubble chart
-        var chart = d3.select("body")
+        var chart = d3.select("#vis-container")
             .append("svg")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
@@ -337,6 +480,10 @@ console.log("At the moment, the states and bubbles are color classified accordin
             .attr("fill", function(d){
 			return colorScale(parseFloat(d[expressed.color]));
             })
+            // add slight border to the circles
+            .attr("stroke", "#333")
+            .attr("stroke-width", 0.5)
+            // add highlight, dehighlight, and moveLabel interactions
             .on("mouseover", function (event, d) {
                 highlight(d);
             })
@@ -345,12 +492,13 @@ console.log("At the moment, the states and bubbles are color classified accordin
             })
             .on("mousemove", moveLabel);
 
-        //below Example 2.8...create a text element for the chart title
+        //below Example 2.8...create a text element for the chart title (intially wouldn't update, debugged + reconfigured, it's working now, yay!)
         var chartTitle = chart.append("text")
-            .attr("x", 30)
+            .attr("x", 35)
             .attr("y", 30)
             .attr("class", "chartTitle")
-            .text("Amenity Class Score (white=worst, dark=best) & Seasonal Temps by State");
+            .text("X: " + getChartTitle(expressed.x) + " | Y: " + getChartTitle(expressed.y))
+            chartTitle.raise();
     };
 
     //function to create a dropdown menu for attribute selection
@@ -363,26 +511,31 @@ console.log("At the moment, the states and bubbles are color classified accordin
                 dropdownLabel = x.label
         })
 
+        // add container to make dropdown styling easier
+        var dropdowns = d3.select(".navbar")
+            .append("div")
+            .attr("class", "dropdowns"); 
+
         //add select element
-        //add dropdown label
-        var label = d3.select(".navbar")
+        //add labels for dropdowns
+        var label = dropdowns
             .append("p")
             .attr("class", "dropdown-label")
             .text(menuLabel + ": ");
        
-        //select .navbar instead of body
-        var dropdown = d3.select(".navbar")
+        // append select element to dropdowns container
+        var dropdown = dropdowns
             .append("select")
             .attr("class", "dropdown")
             .on("change", function(){
                 changeAttribute(this.value, expressedAttribute, csvData)
     });
 
-        //add initial option
+    // add initial option; I kept the 'Select Attribute' label as an entry point affordance 
         var titleOption = dropdown.append("option")
-            .attr("class", "titleOption")
-            .attr("disabled", "true")
-            .text(dropdownLabel);
+        .attr("class", "titleOption")
+        .attr("disabled", "true")
+        .text("Select Attribute");
 
         //add attribute name options
         var attrOptions = dropdown.selectAll("attrOptions")
@@ -399,12 +552,12 @@ console.log("At the moment, the states and bubbles are color classified accordin
             .select(".navbar")
             .append("h1")
             .attr("class", "pageTitle")
-            .text("U.S. States' Natural Amenities Scale")
+            .text("U.S. Natural Amenities Scale, 1970s")
     }
 
     //dropdown change event handler
     function changeAttribute(attribute, expressedAttribute, csvData) {
-        console.log(expressed);
+        // console.log(expressed);
         //change the expressed attribute
         expressed[expressedAttribute] = attribute;
         //recreate x and y scales based on the newly expressed value
@@ -463,6 +616,14 @@ console.log("At the moment, the states and bubbles are color classified accordin
             .attr("cy", function(d){
                 return yScale(parseFloat(d[expressed.y]));
             });
+
+        // update chart title
+        d3.select(".chartTitle")
+            .text("X: " + getChartTitle(expressed.x) + " | Y: " + getChartTitle(expressed.y))
+        
+        // update legend when attribute is changed (inside if clause to prevent errors when loading (color is initially null))
+        renderLegend(colorScale);
+            
     }
 
     // function to create radius scale for the bubble chart -- I chose this instead of a Flannery compensation so my bubbles scale according to SELECTED attribute, not ALL attributes; otherwise, because of the large range of values, some bubbles are very very small and others are very large
@@ -473,9 +634,12 @@ console.log("At the moment, the states and bubbles are color classified accordin
         // guard against identical values (breaks sqrt scale transitions)
         if (min === max) max = min + 1;
 
+        // make bubble radius size responsive to screen size (they were overflowing the screen intially)
+        var maxRadius = Math.min(chartWidth * 0.06, 15);
+
         return d3.scaleSqrt()
             .domain([min, max])
-            .range([4, chartWidth / 30]);
+            .range([4, maxRadius]);
     }
 
     //function to highlight enumeration units and bars
@@ -523,7 +687,7 @@ console.log("At the moment, the states and bubbles are color classified accordin
         
         //label content
         var labelAttribute = "<h1>" + props[expressed.color] +
-            "</h1><b>" + unitLabel + " " + props.ISO3166_2 + " " + "</b>";
+            "</h1><b>" + unitLabel + ",  " + props.ISO3166_2 + " " + "</b>";
 
         //create info label div
         var infolabel = d3.select("body")
@@ -535,10 +699,17 @@ console.log("At the moment, the states and bubbles are color classified accordin
 
     //function to move label
     function moveLabel(event, d) {
+        // getboundingclientrect was originally undefined when I clicked a state and removed the label, causing a crash
+        // to mitigate the crash, I define label and return if the label is empty
+        var label = d3.select(".infolabel");
+        if (label.empty())
+            return;
+
         //text wrapping
         var labelWidth = d3.select(".infolabel")
             .node()
             .getBoundingClientRect().width;
+
         //use coordinates of mousemove event to set label coordinates
         var x1 = event.clientX + 10,
             y1 = event.clientY - 75,
@@ -554,19 +725,79 @@ console.log("At the moment, the states and bubbles are color classified accordin
             .style("top", y + "px")
             .style("left", x + "px")
     }
+        // function to get chart title as the user choses an attribute with the dropdown
+        // I added a section to changeAttribute to update title as the chart updates
+        function getChartTitle(attr) {
+            let label;
+            attrObjects.forEach(function(d) {
+                if (d.attr === attr)
+                    label = d.label;
+            });
+            return label;
+        }
+
+        // funciton to render dynamic choropleth legend (adapted from stackoverflow)
+        function renderLegend(colorScale) {
+            // empty legend before updating
+            d3.select("#legend").selectAll("*").remove();
+
+            //build legend
+            var legend = d3.select("#legend")
+                .append("div")
+                .attr("class", "legend");
+
+            var domain = colorScale.domain();
+            var range = colorScale.range();
+            
+            var items = legend.selectAll(".legend-item")
+                .data(range)
+                .enter()
+                .append("div")
+                .attr("class", "legend-item");
+
+            // define units to add to the labels
+            var unitLabel;
+            attrObjects.forEach(function(x){
+                if (expressed.color == x.attr)
+                    unitLabel = x.unit;
+            });
+
+            items.append("div")
+                .attr("class", "legend-color")
+                .style("background-color", d => d);
+
+            // update legend labels dynamically
+            items.append("span")
+                .text((d, i) => {
+                    if (i === 0) {
+                        return "< " + domain[0].toFixed(1);
+                    } else if (i === domain.length) {
+                        return "> " + domain[domain.length - 1].toFixed(1);
+                    } else {
+                        return domain[i - 1].toFixed(1) + " – " + domain[i].toFixed(1);
+                    }
+                });
+            
+            d3.select("#legend")
+                .insert("div", ":first-child")
+                .style("text-align", "center")
+                .style("font-weight", "bold")
+                .text(unitLabel);
+        }
 
 })(); //last line of main.js
 
 
 
 // Pseudocode:
-    // For attribute change listener:
-        // ON USER SELECTION:
-        // Step 1. Change the expressed attribute
-        // Step 2. Recreate the color scale with new class breaks
-        // Step 3. Recolor each enumeration unit on the map
-        // Step 4. Resize each circle on the bubble chart
-        // Step 5. Recolor each circle on the bubble chart
+
+// for zoom to feature, add popup containing info for all three chosen attributes per the clicked state
+// edit popup position, esp for mobile
+// move .style features to css
+//Change welcome popup from fade out to exit
+// Add page context below the map
+// add text styles 
+// Check rubric, you might be close? 
 
         // Responsive design, css grids, navbar restyling
         // Readable options; set up json to match prop titles to human readable forms, loop through object props until match -- retreive label
@@ -578,3 +809,4 @@ console.log("At the moment, the states and bubbles are color classified accordin
         // style through css
         // any other tools or features that add to the utility, usability, and or aesthetics of the coordinated vis
         // 
+        

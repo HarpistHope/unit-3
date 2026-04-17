@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-            <title></title>
+            <title>U.S. Natural Amenity Explorer</title>
 
         <!-- Favicon from pinhead.ink (mountain_and_lake) -->
         <link rel="icon" type="image/png" href="img/favicon.png">
@@ -21,8 +21,76 @@
 
     <body>
         <!--put your initial page content here-->
-        <!--example 1.2-->
+        <!--add navbar and vis-container classes-->
         <div class="navbar"></div>
+
+        <div id="legend-container">
+            <div id="legend"></div>
+        </div>
+
+        <div id="vis-container"></div>
+
+        <div id="context">
+            <section class="context-section">
+                <h2>Overview</h2>
+                    <p>
+                        In 1999, the USDA Economic Research Service released a <a href="https://www-tx.ers.usda.gov/publications/pub-details?pubid=41048">report</a> examining the relationship between natural amenities and rural population change. The study introduced a <b>Natural Amenities Scale</b> to evaluate and rank environmental qualities across counties in the contiguous United States.
+                    </p>
+                    <p>
+                        The study combines multiple environmental factors selected for simplicity, availability, lack of redundancy, correlation to population change, and influence on public desirability. These variables were standardized into a composite score, which was then used to rank each county from 1 to 7 (1 = least natural amenities/desirable, 7 = most natural amenities/desirable). Note that the Natural Amenity Scale is merely a statistical model of environmental preference; it does not provide an absolute measure regional desirability. Interpretation of results may be subject to personal bias. 
+                    </p>
+            </section>
+            <section class="context-section">
+                <h2>Data Source & Variables</h2>
+                    <p>
+                        The Natural Amenities Scale is based on data from 1941-1970, aggregated at the county level. Each value represents the average of that attribute over the entire time range. Attribute descriptions are given by the <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale/documentation">USDA</a>. Below is a summary of the descriptions:
+                    </p>
+                    <ul class="descriptions">
+                        <li><b>Warm Winters:</b> average January Temperature</li>
+                        <li><b>Winter Sun:</b> average January hours of sunlight</li>
+                        <li><b>Temperate Summers:</b> average July Temperature</li>
+                        <li><b>Summer Humidity:</b> relative humidity in July</li>
+                        <li><b>Topographic Variation:</b> categorized landform diversity, based on dominant topographic types within each county</li>
+                        <li><b>Water Area:</b> proportion of county covered by water (log-transformed and capped to reduce coastal bias) </li>
+                    </ul>
+            </section>
+            <section class="context-section">
+                <h2>This Project</h2>
+                    <p>
+                        This project aggregates county-level values into state-level averages. These values are mapped across the choropleth and coordinated bubble chart visualizations above. 
+                    </p>
+                    <p>   
+                        Use the map to compare natural amenity patterns across states. For example, locate the states that experience the fewest hours of winter sunlight (hint: look at the Pacific Northwest).
+                        Use the chart to explore relationships between natural amenities. For example, notice the clustering of states with a higher topographic variation score around cooler winter and summer temperatures.
+                    </p>
+                    <p>   
+                        Take your time to explore all the attribute combinations. Do any of the natural amenity scores or ranks take you by surprise? How does your state measure up against its neighbors?
+                    </p>
+            </section>
+            <section class="context-section">
+                <h2>Classification</h2>
+                    <p>
+                        This data is classified using the CKMeans Clustering method to preserve natural groupings within each attribute.
+                        The final natural amenity rank (1-7) did not fit cleanly within this type of classification scheme. It is instead presented as a discrete ordinal category within the clicked state popups. 
+                    </p>
+            </section>
+            <section class="context-section">
+                <h2>Closing Notes</h2>
+                    <p>
+                        This dataset reflects natural amenity scores measured according environmental conditions from the mid-20th century (1941-1970). Changes in climate and land use may alter how these scores would be measured today. Further research is strongly encouraged.
+                    </p>
+            </section>
+        </div>
+
+<!-- 
+        <button id="button">Welcome Button</button>
+
+        <div class="welcomePopup" id ="welcomePop"
+            <span>Welcome Popup</span>
+        </div> -->
+        
+
+       
         <!--you can also use this space for internal scripts;
         place these within <script> tags-->
 
@@ -35,5 +103,6 @@
         <script src="lib/topojson/topojson.js"></script>
 
         <script type="text/javascript" src="js/main.js"></script>
+
     </body>
 </html>
