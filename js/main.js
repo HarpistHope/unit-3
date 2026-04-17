@@ -10,7 +10,7 @@
     // define welcome popup; add close button
     welcome.html(`
         <div class="welcome-content">
-        <p><strong>Welcome to the Natural Amenity Scale Explorer!</strong></p>
+        <p><strong>Welcome to the Natural Amenities Scale Explorer!</strong></p>
         <p>Add some color to the map and place bubbles on the chart by selecting attributes from the dropdowns above.</p>
         <p>Click on a state to zoom and open additional ranking details.</p>
         <p>Hover over a state to see a summary of the selected color/bubble size attribute.</p>
@@ -48,7 +48,7 @@
     },
     {
         attr:"avg_water_area_z",
-        label:"Water Area (Standardized)",
+        label:"Standardized Water Area (z-score)",
         unit:"Z-Score (log-transformed water area)"
     },
     {
@@ -551,7 +551,7 @@
             .select(".navbar")
             .append("h1")
             .attr("class", "pageTitle")
-            .text("U.S. Natural Amenities Scale Explorer")
+            .text("Natural Amenities Explorer")
     }
 
     //dropdown change event handler

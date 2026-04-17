@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-            <title>U.S. Natural Amenity Scale Explorer</title>
+            <title>U.S. Natural Amenities Scale</title>
 
         <!-- Favicon from pinhead.ink (mountain_and_lake) -->
         <link rel="icon" type="image/png" href="img/favicon.png">
@@ -37,20 +37,23 @@
                         In 1999, the USDA Economic Research Service released a <a href="https://www-tx.ers.usda.gov/publications/pub-details?pubid=41048">report</a> examining the relationship between natural amenities and rural population change. The study introduced a <b>Natural Amenities Scale</b> to evaluate and rank environmental qualities across counties in the contiguous United States.
                     </p>
                     <p>
-                        The study combines multiple environmental factors selected for simplicity, availability, lack of redundancy, correlation to population change, and influence on public desirability. These variables were standardized into a composite score, which was then used to assign a derived 1-7 ordinal classification rank (1 = least natural amenities/desirable, 7 = most natural amenities/desirable). Note that the Natural Amenity Scale is merely a statistical model of environmental preference; it does not provide an absolute measure of regional desirability. Interpretation of results may be subject to personal bias. 
+                        The study combines multiple environmental factors selected for simplicity, availability, lack of redundancy, correlation to population change, and influence on perceived public desirability. These variables were standardized into a composite score, which was then used to derive an ordinal classification rank from 1-7 (1 = least natural amenities/desirable, 7 = most natural amenities/desirable).
+                    </p>
+                    <p>    
+                        Note that the Natural Amenity Scale is merely a statistical model of environmental preference; it does not provide an absolute measure of regional desirability. Interpretation of results may be subject to personal bias. 
                     </p>
             </section>
             <section class="context-section">
                 <h2>Data Source & Variables</h2>
                     <p>
-                        The Natural Amenities Scale is based on data from 1941-1970, aggregated at the county level. Each value represents the average of that attribute over the entire time range. Attribute descriptions are given by the <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale/documentation">USDA</a>. Below is a summary of the descriptions:
+                        The Natural Amenities Scale is based on data from 1941-1970, aggregated at the county level. Each attribute value represents the average of a desirable environmental factor over the entire time range. Precise attribute descriptions are given by the <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale/documentation">USDA</a>. Below is a summary of the descriptions:
                     </p>
                     <ul class="descriptions">
                         <li><b>Warm Winters:</b> average January Temperature</li>
                         <li><b>Winter Sun:</b> average January hours of sunlight</li>
                         <li><b>Temperate Summers:</b> average July Temperature</li>
                         <li><b>Summer Humidity:</b> relative humidity in July</li>
-                        <li><b>Topographic Variation:</b> ordinal landform diversity class (derived from a 21-category topography scale based on dominant landform types and variation within each county); higher classes reflect more varied and mountainous terrain and contributed more to the composite standardized score used in this project</li>
+                        <li><b>Topographic Variation:</b> ordinal landform diversity class (derived from a 21-category topography scale based on dominant landform types and variation within each county); higher classes reflect more varied and mountainous terrain and contributed more to the composite standardized score</li>
                         <li><b>Water Area:</b> proportion of county covered by water (capped to reduce coastal bias, log-transformed and standardized as a z-score) </li>
                     </ul>
             </section>
@@ -61,7 +64,7 @@
                     </p>
                     <p>   
                         Use the map to compare natural amenity patterns across states. For example, locate the states that experience the fewest hours of winter sunlight (hint: look at the Pacific Northwest).
-                        Use the chart to explore relationships between natural amenities. For example, use the dropdowns to select topographic variation, January temps, and July temps. Look for the cluster of states with a higher topographic variation score around cooler winter and summer temperatures. What insights could be generated from this observation?
+                        Use the chart to explore relationships between natural amenities. For example, select standardized topography, January temperature, and July temperature from the three dropdowns above. There is a cluster of states with a higher topographic variation score around cooler winter and summer temperatures. What insights could be generated from this observation?
                     </p>
                     <p>   
                         Take your time to explore all the attribute combinations. Do any of the natural amenity scores or ranks take you by surprise? How does your state measure up against its neighbors?
@@ -70,8 +73,8 @@
             <section class="context-section">
                 <h2>Classification</h2>
                     <p>
-                        In this state-aggregated dataset, variables are expressed as averages, percentages, or standardized z-scores. The CKMeans clustering method was applied to preserve natural groupings within each attribute and to reduce the influence of differing measurement scales across variables.
-                        The final natural amenity rank (1-7) did not fit cleanly within this type of classification scheme. It is instead presented as a discrete ordinal category within the clicked state popups. 
+                        In this state-aggregated dataset, variables are expressed as averages, percentages, or standardized z-scores. The CKMeans clustering method was applied to preserve natural groupings and to reduce the influence of differing measurement scales across variables.
+                        Because the classified natural amenity rank (1-7) does not fit cleanly within the CKMeans clustering classification scheme, it is instead presented as a discrete ordinal category within the clicked state popups. 
                     </p>
             </section>
             <section class="context-section">
@@ -83,7 +86,7 @@
                         Data can be easily accessed from the USDA's website using the following link: <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale">Natural Amenities Scale</a>
                     </p>
                     <p>
-                        U.S. States Shapefile accessed from the Project Linework <a href="https://www.projectlinework.org/">webpage</a> (Editors: Daniel P. Huffman, Hans van der Maarel. Shapefile Name: Times Approximate.) For this project, I selected the contiguous U.S and reprojected the shapefile to WGS 84 in ArcGIS Pro before converting to topojson with MapShaper.
+                        U.S. States Shapefile accessed from the Project Linework <a href="https://www.projectlinework.org/">webpage</a> (Editors: Daniel P. Huffman, Hans van der Maarel. Shapefile Name: Times Approximate.) For this project, I selected the contiguous U.S and reprojected the shapefile to WGS 84 in ArcGIS Pro. I then converted the shapefile to topojson format with MapShaper.
                     </p>
             </section>
         </div>
