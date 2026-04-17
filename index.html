@@ -37,7 +37,7 @@
                         In 1999, the USDA Economic Research Service released a <a href="https://www-tx.ers.usda.gov/publications/pub-details?pubid=41048">report</a> examining the relationship between natural amenities and rural population change. The study introduced a <b>Natural Amenities Scale</b> to evaluate and rank environmental qualities across counties in the contiguous United States.
                     </p>
                     <p>
-                        The study combines multiple environmental factors selected for simplicity, availability, lack of redundancy, correlation to population change, and influence on public desirability. These variables were standardized into a composite score, which was then used to rank each county from 1 to 7 (1 = least natural amenities/desirable, 7 = most natural amenities/desirable). Note that the Natural Amenity Scale is merely a statistical model of environmental preference; it does not provide an absolute measure regional desirability. Interpretation of results may be subject to personal bias. 
+                        The study combines multiple environmental factors selected for simplicity, availability, lack of redundancy, correlation to population change, and influence on public desirability. These variables were standardized into a composite score, which was then used to assign a derived 1-7 ordinal classification rank (1 = least natural amenities/desirable, 7 = most natural amenities/desirable). Note that the Natural Amenity Scale is merely a statistical model of environmental preference; it does not provide an absolute measure of regional desirability. Interpretation of results may be subject to personal bias. 
                     </p>
             </section>
             <section class="context-section">
@@ -50,18 +50,18 @@
                         <li><b>Winter Sun:</b> average January hours of sunlight</li>
                         <li><b>Temperate Summers:</b> average July Temperature</li>
                         <li><b>Summer Humidity:</b> relative humidity in July</li>
-                        <li><b>Topographic Variation:</b> categorized landform diversity, based on dominant topographic types within each county</li>
+                        <li><b>Topographic Variation:</b> ordinal landform diversity class (derived from a 21-category topography scale based on dominant landform types and variation within each county); higher classes reflect more varied and mountainous terrain and contributed more to the composite standardized score used in this project</li>
                         <li><b>Water Area:</b> proportion of county covered by water (log-transformed and capped to reduce coastal bias) </li>
                     </ul>
             </section>
             <section class="context-section">
                 <h2>This Project</h2>
                     <p>
-                        This project aggregates county-level values into state-level averages. These values are mapped across the choropleth and coordinated bubble chart visualizations above. 
+                        The data for this project was aggregated from the original county-level values to state-level averages. These values are mapped across the choropleth and coordinated bubble chart visualizations above. 
                     </p>
                     <p>   
                         Use the map to compare natural amenity patterns across states. For example, locate the states that experience the fewest hours of winter sunlight (hint: look at the Pacific Northwest).
-                        Use the chart to explore relationships between natural amenities. For example, notice the clustering of states with a higher topographic variation score around cooler winter and summer temperatures.
+                        Use the chart to explore relationships between natural amenities. For example, use the dropdowns to select topographic variation, January temps, and July temps. Look for the cluster of states with a higher topographic variation score around cooler winter and summer temperatures. What insights could be generated from this observation?
                     </p>
                     <p>   
                         Take your time to explore all the attribute combinations. Do any of the natural amenity scores or ranks take you by surprise? How does your state measure up against its neighbors?
@@ -78,6 +78,9 @@
                 <h2>Closing Notes</h2>
                     <p>
                         This dataset reflects natural amenity scores measured according environmental conditions from the mid-20th century (1941-1970). Changes in climate and land use may alter how these scores would be measured today. Further research is strongly encouraged.
+                    </p>
+                    <p>
+                        Data can be easily accessed from the USDA's website using the following link: <a href="https://www.ers.usda.gov/data-products/natural-amenities-scale">Natural Amenities Scale</a>
                     </p>
             </section>
         </div>

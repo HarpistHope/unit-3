@@ -143,7 +143,7 @@ option {
 
 .selected{
     stroke: rgb(251, 247, 25);
-    stroke-width: 3px;
+    stroke-width: 2.6px;
     /* highlighter yellow: rgb(251, 247, 25) */
 }
 

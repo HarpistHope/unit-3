@@ -1,7 +1,7 @@
 //First line of main.js...wrap everything in a self-executing anonymous function to move to local scope
 (function(){
 
-    // I start by creating a welcome popup/point of entry to the webpage
+    // create welcome popup/point of entry to the webpage
     var welcome = d3.select("body")
         .append("div")
         .attr("class", "welcomePopup")
@@ -18,7 +18,8 @@
         <button class="close-btn">Close</button>
         </div>
         `);
-    // add close button click funtion
+
+    // hide welcome popup on click
     d3.select(".close-btn").on("click", function() {
         welcome.style("display", "none")
     })
@@ -62,7 +63,7 @@
     },
     ]
 
-    //create an object for different expressed variables
+    //store current attribute selections
     var expressed  = {
         x:attrObjects[0].attr, //x attribute (avg_jan_temp)
         y:attrObjects[0].attr, //y attribute (avg_jan_temp)
@@ -76,8 +77,7 @@
         .style("position", "absolute")
         .style("visibility", "hidden");
 
-    //chart frame dimensions; check size of screen, if over 700 pixels, create a chart container the entire width of the screen.
-    //The chart will stack below the map
+    //set responsive chart frame dimensions (responsive to window size)
     if(window.innerWidth < 700)
         var chartWidth = window.innerWidth - 40
     else
@@ -91,27 +91,27 @@
     //begin script when window loads
     window.onload = setMap;
 
-    // first funciton (within wrapping anonymous function), set up choropleth map
+    // set up choropleth map
     function setMap(){
 
         //check size of screen, if over 700 pixels, create a map container the entire width of the screen
         //the map will stack atop the chart
         if(window.innerWidth < 700)
-            var width = window.innerWidth - 40
+            var mapWidth = window.innerWidth - 40
         else
-            var width = window.innerWidth * 0.5 - 10
+            var mapWidth = window.innerWidth * 0.5 - 10
 
-        var height = window.innerHeight - 250;
+        var mapHeight = window.innerHeight - 250;
 
         //create new svg container for the map
         var map = d3.select("#vis-container")
             .append("svg")
             .attr("class", "map")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", mapWidth)
+            .attr("height", mapHeight);
 
         // Here I begin to integrate the D3 zoom to bounding box interaction to my map
-        // I will pass g into setEnumerationUnits and add zoom/click-to-zoom functions
+        // I later pass g into setEnumerationUnits and add zoom/click-to-zoom functions
         var g = map.append("g");
 
         //Create Albers equal area conic projection -- This will be an appropriate projection for my choropleth map focusing on the lower 48 US States
@@ -129,28 +129,29 @@
         ];
         Promise.all(promises).then(callback);
 
-        // add zoom interaction behavior to the map
+        // add zoom interaction behavior to the map (from d3 example)
         var zoom = d3.zoom()
             .scaleExtent([1, 8])
             .on("zoom", zoomed);
         map.call(zoom);
 
+        // create callback function to join data and call other functions
         function callback(data){	
             
             var csvData = data[0], topoData = data[1];
                 // console.log(csvData);
                 // console.log(topoData);
 
-            //translate TopoJSON
+            //translate TopoJSON to geojson
             var usStates = topojson.feature(topoData, topoData.objects.states_wgs84).features;
                 
             //join csv data to GeoJSON enumeration units
             usStates = joinData(usStates, csvData);
 
             // add responsive projection parameters with responsive padding
-            var padding = Math.max(10, width * 0.05);
+            var padding = Math.max(10, mapWidth * 0.05);
             projection.fitExtent(
-                [[padding, padding], [width - padding, height - padding]], 
+                [[padding, padding], [mapWidth - padding, mapHeight - padding]], 
                 {type: "FeatureCollection", features: usStates});
 
             // create the color scale
@@ -162,7 +163,7 @@
             //add coordinated visualization to the map
             setChart(csvData, colorScale);
 
-            //add title
+            //add title to navbar
             createTitle();
 
             //add dropdown to adjust attribute
@@ -179,15 +180,16 @@
             
         };
 
-        // set up clicked funtion to zoom to bounding box (state); adapted from d3 gallery
+        // set up clicked function to zoom to bounding box (state) and make statePopup visible; adapted from d3 gallery
         function clicked(event, d) {
-            // turn statepopup visible upon click
+            // statePopup will activate/turn visible on click
             statePopup.style("visibility", "visible")
 
-            // set up zoom sequence, from d3
+            // create bounding box, from d3
             const [[x0, y0], [x1, y1]] = path.bounds(d);
             event.stopPropagation();
 
+            // apply zoom transform, from d3
             map.transition().duration(750).call(
                 zoom.transform,
                 d3.zoomIdentity
@@ -202,9 +204,6 @@
                 
         )};
 
-        // add click and reset interactions from d3 gallery
-        map.on("click", reset);
-
         // add zoom function (part of d3 zoom to bounding box interaction )
         function zoomed(event) {
             g.attr("transform", event.transform);
@@ -217,11 +216,14 @@
                 zoom.transform,
                 d3.zoomIdentity
             );
-            // make popup invisible again
+            // make popup invisible/hidden again
             statePopup.style("visibility", "hidden")
             // dehighlight selected state
             d3.selectAll(".state").classed("selected", false);
         }
+
+        // call reset function on click
+        map.on("click", reset);
 
         // I added setEnumerationUnits to the setMap function so I can use the d3 interaction zoom to bounding box (i.e, enumeration unit)
         function setEnumerationUnits(usStates, g, path, colorScale){
@@ -254,20 +256,17 @@
 
             // remove the hover label on click; it comes back as soon as the mouseover starts again
             d3.select(".infolabel").remove();
-            console.log(d.properties);
+            // console.log(d.properties);
             clicked(event, d);
 
-            // Add state-specific popup containing additional info about associate between natural amenities scale score and class rank
+            // Create popup with additional info about association between natural amenities scale score and class rank
             statePopup.html(
                 `<strong>State:</strong> ${d.properties.NAME}<br><br>
                 <strong>Natural Amenity Scale and Rank: </strong>On the standardized natural amenity scale, ${d.properties.NAME} comes in at <strong>${d.properties.avg_amenity_scale}.</strong><br><br>
                 Using this standardized score to rank the state from 1 to 7 (1 meaning low natural amenity appeal, 7 meaning high natural amenity appeal) gives ${d.properties.NAME} an overall natural amenity rank of:<strong> ${d.properties.amen_class}</strong>`
             ); 
 
-            // get map bounding box
-            var mapRect = d3.select(".map").node().getBoundingClientRect();
-
-            // Call and Position popup, turn visibility on when clicked
+            // Position popup (uses window percentages of vis-container to position it consistantly on the map frame), turn visibility on when clicked
             statePopup
                 .style("left", "25%")
                 .style("top", "95%")
@@ -289,7 +288,7 @@
     }
 
         // define padding for the reset button
-        var padding = Math.max(10, width * 0.02);
+        var padding = Math.max(10, mapWidth * 0.02);
         
         // add reset button to zoom back to default view; the "translate..." statement should help position the button appropriately even when the window is resized
         var resetButton = map.append("g")
@@ -304,6 +303,7 @@
             .attr("height", 30)
             .attr("rx", 6)
             .attr("ry", 6);
+
         // add reset button text
         resetButton.append("text")
             .attr("x", 40)
@@ -327,7 +327,7 @@
 
                     //where primary keys match, transfer csv data to geojson properties object
                     if (geojsonKey == csvKey) {
-                        // first I separate out the average amenity class rank
+                        // first separate out the average amenity class rank
                         // because this attribute doesn't normalize well with the rest of my datat (it divides the states into one of 7 rank categories), I will add it to the .on click popup as an extra detail
                         geojsonProps.amen_class = parseFloat(csvState.avg_amenity_class);
 
@@ -381,7 +381,7 @@
         return colorScale;
     };
 
-        //add function to calculate the minimum and maximum values for expressed variables
+    //add function to calculate the minimum and maximum values for expressed variables
     function getDataValues(csvData, expressedValue) {
         var max = d3.max(csvData, function(d) { 
             return parseFloat(d[expressedValue]); 
@@ -434,9 +434,6 @@
 
     //function to create coordinated bubble chart
     function setChart(csvData, colorScale){
-        //chart frame dimensions
-        // var chartWidth = window.innerWidth * 0.5 -25,
-        //     chartHeight = 500;
 
         //create a second svg element to hold the bubble chart
         var chart = d3.select("#vis-container")
@@ -451,7 +448,7 @@
         var xScale = createXScale(csvData, chartWidth);
         //create axes
         createChartAxes(chart,chartWidth,chartHeight, yScale, xScale) 
-        // Here I set up a radius scale instead of using Flannery's computation to proportionally scale my bubbles according to selected attribute
+        // Here I set up a radius scale instead of using Flannery's computation to proportionally scale my bubbles according to selected attribute (the range of my data values is too large to use Flannery's for everything)
         // this way, the bubbles don't get too big and fall out of the chart frame
         var radiusScale = createRadiusScale(csvData);
 
@@ -492,7 +489,7 @@
             })
             .on("mousemove", moveLabel);
 
-        //below Example 2.8...create a text element for the chart title (intially wouldn't update, debugged + reconfigured, it's working now, yay!)
+        //below Example 2.8...create a text element for the chart title 
         var chartTitle = chart.append("text")
             .attr("x", 35)
             .attr("y", 30)
@@ -552,7 +549,7 @@
             .select(".navbar")
             .append("h1")
             .attr("class", "pageTitle")
-            .text("U.S. Natural Amenities Scale, 1970s")
+            .text("U.S. Natural Amenities Scale, 1941-1970")
     }
 
     //dropdown change event handler
@@ -637,12 +634,13 @@
         // make bubble radius size responsive to screen size (they were overflowing the screen intially)
         var maxRadius = Math.min(chartWidth * 0.06, 15);
 
+        // return the equation using the values calculated above
         return d3.scaleSqrt()
             .domain([min, max])
             .range([4, maxRadius]);
     }
 
-    //function to highlight enumeration units and bars
+    //function to highlight enumeration units and bubbles
     function highlight(props) {
         //change stroke
         var selected = d3.selectAll("." + props.ISO3166_2)
@@ -660,7 +658,7 @@
 
     };
 
-    //function to dehighlight enumeration units and bars
+    //function to dehighlight enumeration units and bubbles
     function dehighlight(props) {
         // remove label
         d3.select(".infolabel")
@@ -699,8 +697,7 @@
 
     //function to move label
     function moveLabel(event, d) {
-        // getboundingclientrect was originally undefined when I clicked a state and removed the label, causing a crash
-        // to mitigate the crash, I define label and return if the label is empty
+        // to mitigate crashes (which were happening), I define label and return if the label is empty
         var label = d3.select(".infolabel");
         if (label.empty())
             return;
@@ -725,65 +722,66 @@
             .style("top", y + "px")
             .style("left", x + "px")
     }
-        // function to get chart title as the user choses an attribute with the dropdown
-        // I added a section to changeAttribute to update title as the chart updates
-        function getChartTitle(attr) {
-            let label;
-            attrObjects.forEach(function(d) {
-                if (d.attr === attr)
-                    label = d.label;
+
+    // function to get chart title as the user choses an attribute with the dropdown
+    // I added a section to changeAttribute to update title as the chart updates
+    function getChartTitle(attr) {
+        let label;
+        attrObjects.forEach(function(d) {
+            if (d.attr === attr)
+                label = d.label;
+        });
+        return label;
+    }
+
+    // function to render dynamic choropleth legend (adapted from stackoverflow)
+    function renderLegend(colorScale) {
+        // empty legend before updating
+        d3.select("#legend").selectAll("*").remove();
+
+        //build legend
+        var legend = d3.select("#legend")
+            .append("div")
+            .attr("class", "legend");
+
+        var domain = colorScale.domain();
+        var range = colorScale.range();
+        
+        var items = legend.selectAll(".legend-item")
+            .data(range)
+            .enter()
+            .append("div")
+            .attr("class", "legend-item");
+
+        // define units to add to the labels
+        var unitLabel;
+        attrObjects.forEach(function(x){
+            if (expressed.color == x.attr)
+                unitLabel = x.unit;
+        });
+
+        items.append("div")
+            .attr("class", "legend-color")
+            .style("background-color", d => d);
+
+        // update legend labels dynamically
+        items.append("span")
+            .text((d, i) => {
+                if (i === 0) {
+                    return "< " + domain[0].toFixed(1);
+                } else if (i === domain.length) {
+                    return "> " + domain[domain.length - 1].toFixed(1);
+                } else {
+                    return domain[i - 1].toFixed(1) + " – " + domain[i].toFixed(1);
+                }
             });
-            return label;
-        }
-
-        // funciton to render dynamic choropleth legend (adapted from stackoverflow)
-        function renderLegend(colorScale) {
-            // empty legend before updating
-            d3.select("#legend").selectAll("*").remove();
-
-            //build legend
-            var legend = d3.select("#legend")
-                .append("div")
-                .attr("class", "legend");
-
-            var domain = colorScale.domain();
-            var range = colorScale.range();
-            
-            var items = legend.selectAll(".legend-item")
-                .data(range)
-                .enter()
-                .append("div")
-                .attr("class", "legend-item");
-
-            // define units to add to the labels
-            var unitLabel;
-            attrObjects.forEach(function(x){
-                if (expressed.color == x.attr)
-                    unitLabel = x.unit;
-            });
-
-            items.append("div")
-                .attr("class", "legend-color")
-                .style("background-color", d => d);
-
-            // update legend labels dynamically
-            items.append("span")
-                .text((d, i) => {
-                    if (i === 0) {
-                        return "< " + domain[0].toFixed(1);
-                    } else if (i === domain.length) {
-                        return "> " + domain[domain.length - 1].toFixed(1);
-                    } else {
-                        return domain[i - 1].toFixed(1) + " – " + domain[i].toFixed(1);
-                    }
-                });
-            
-            d3.select("#legend")
-                .insert("div", ":first-child")
-                .style("text-align", "center")
-                .style("font-weight", "bold")
-                .text(unitLabel);
-        }
+        
+        d3.select("#legend")
+            .insert("div", ":first-child")
+            .style("text-align", "center")
+            .style("font-weight", "bold")
+            .text(unitLabel);
+    }
 
 })(); //last line of main.js
 
