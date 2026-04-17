@@ -47,9 +47,9 @@
         unit:"Relative Humidity (%)"
     },
     {
-        attr:"avg_water_area",
-        label:"Percent Water Area",
-        unit:"%"
+        attr:"avg_water_area_z",
+        label:"Standardized Water Area Score",
+        unit:"Standard deviations from mean (z-score)"
     },
     {
         attr:"avg_topography_z",
@@ -124,7 +124,7 @@
 
         //use Promise.all to parallelize asynchronous data loading
         var promises = [
-            d3.csv("data/state_natural_amenities_avg.csv"),
+            d3.csv("data/state_natural_amenities_waterZ.csv"),
             d3.json("data/states_wgs84.topojson")
         ];
         Promise.all(promises).then(callback);
@@ -549,7 +549,7 @@
             .select(".navbar")
             .append("h1")
             .attr("class", "pageTitle")
-            .text("U.S. Natural Amenities Scale, 20th Century")
+            .text("20th Century U.S. Natural Amenities Scale")
     }
 
     //dropdown change event handler
